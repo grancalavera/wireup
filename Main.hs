@@ -11,16 +11,21 @@ main = do
   args <- getArgs
   case args of
     []     -> putStrLn "usage"
-    [path] -> resolveParent path
+    [path] -> resolveTargetDir path
     _      -> putStrLn "too many args"
 
-resolveParent :: FilePath -> IO()
-resolveParent path = do
+resolveTargetDir :: FilePath -> IO ()
+resolveTargetDir path = do
   restore   <- getCurrentDirectory
   canonical <- canonicalizePath path
   setCurrentDirectory canonical
+  target <- getCurrentDirectory
+  setCurrentDirectory restore
   current <- getCurrentDirectory
-  putStrLn current
+  putStrLn $ "current: " ++ current
+  putStrLn $ "target:  " ++ target
+  putStrLn $ "program: " ++ programName target
+  
 
 split :: (a -> Bool) -> [a] -> [[a]]
 split _ [] = []
@@ -30,5 +35,5 @@ split f (x:xs)
   where
     (current, next) = span (not . f) xs
 
-directoryName :: FilePath -> FilePath
-directoryName path = last $ split (=='/') path
+programName :: FilePath -> FilePath
+programName path = last $ split (=='/') path
