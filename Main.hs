@@ -13,16 +13,22 @@ main = do
     []     -> putStrLn "usage"
     [path] -> resolveParent path
     _      -> putStrLn "too many args"
-    
-resolveParent path = 
-  canonicalizePath path >>= 
-  setCurrentDirectory   >>
-  getCurrentDirectory   >>=
-  putStrLn
 
---do
---  canonical <- canonicalizePath path
---  setCurrentDirectory canonical
---  current <- getCurrentDirectory
---  putStrLn current  
+resolveParent :: FilePath -> IO()
+resolveParent path = do
+  restore   <- getCurrentDirectory
+  canonical <- canonicalizePath path
+  setCurrentDirectory canonical
+  current <- getCurrentDirectory
+  putStrLn current
 
+split :: (a -> Bool) -> [a] -> [[a]]
+split _ [] = []
+split f (x:xs)
+  | f x       = [ current ] ++ split f next
+  | otherwise = [ x : current ] ++ split f next
+  where
+    (current, next) = span (not . f) xs
+
+directoryName :: FilePath -> FilePath
+directoryName path = last $ split (=='/') path
