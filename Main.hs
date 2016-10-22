@@ -30,10 +30,11 @@ resolveTargetDir path = do
 split :: (a -> Bool) -> [a] -> [[a]]
 split _ [] = []
 split f (x:xs)
-  | f x       = [ current ] ++ split f next
-  | otherwise = [ x : current ] ++ split f next
+  | f x       = [ current ] ++ next'
+  | otherwise = [ x : current ] ++ next'
   where
     (current, next) = span (not . f) xs
+    next' = split f next
 
 programName :: FilePath -> FilePath
 programName path = last $ split (=='/') path
