@@ -25,16 +25,14 @@ resolveTargetDir path = do
   putStrLn $ "current: " ++ current
   putStrLn $ "target:  " ++ target
   putStrLn $ "program: " ++ programName target
-  
 
 split :: (a -> Bool) -> [a] -> [[a]]
 split _ [] = []
 split f (x:xs)
-  | f x       = [ current ] ++ next'
-  | otherwise = [ x : current ] ++ next'
+  | f x       = [ ] ++ split f xs
+  | otherwise = [ current ] ++ split f next
   where
-    (current, next) = span (not . f) xs
-    next' = split f next
+    (current, next) = span (not . f) (x:xs)
 
 programName :: FilePath -> FilePath
 programName path = last $ split (=='/') path
